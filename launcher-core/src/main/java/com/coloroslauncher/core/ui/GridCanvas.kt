@@ -1,6 +1,7 @@
 package com.coloroslauncher.core.ui
 
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -122,7 +123,7 @@ private fun GridCell(
                 )
             }
             .pointerInput(item.id) {
-                androidx.compose.foundation.gestures.detectTapGestures(onTap = { onTap() })
+                detectTapGestures(onTap = { onTap() })
             },
         contentAlignment = androidx.compose.ui.Alignment.Center,
     ) {
