@@ -58,4 +58,26 @@ object GridLayoutLogic {
     /** Re-indexes dock slots 0..n-1 after a removal or reorder, preserving relative order. */
     fun reindexDockSlots(itemsInOrder: List<GridItemEntity>): List<GridItemEntity> =
         itemsInOrder.mapIndexed { index, item -> item.copy(dockSlot = index) }
+
+    /** Where a single app should land once placed on the workspace grid, row-major from (0,0). */
+    data class GridPlacement(val componentKey: String, val column: Int, val row: Int)
+
+    /**
+     * Splits [componentKeys] between the dock (first [dockCapacity]) and page-0 workspace cells
+     * (row-major, up to `columns * rows`), for populating an empty home screen on first launch.
+     * Any apps beyond dock + page-0 capacity are simply left reachable from the app drawer only.
+     */
+    fun planInitialSeed(
+        componentKeys: List<String>,
+        dockCapacity: Int,
+        columns: Int,
+        rows: Int,
+    ): Pair<List<String>, List<GridPlacement>> {
+        val dockKeys = componentKeys.take(dockCapacity)
+        val gridKeys = componentKeys.drop(dockKeys.size).take(columns * rows)
+        val placements = gridKeys.mapIndexed { index, key ->
+            GridPlacement(key, column = index % columns, row = index / columns)
+        }
+        return dockKeys to placements
+    }
 }

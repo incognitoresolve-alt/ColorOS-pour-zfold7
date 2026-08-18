@@ -71,6 +71,8 @@ class HomeViewModel(
             _uiState.value = _uiState.value.copy(
                 appsByComponentKey = apps.associateBy(AppInfo::componentKey),
             )
+            val dimensions = _uiState.value.gridDimensions
+            layoutRepository.seedInitialLayoutIfEmpty(apps, dimensions.columns, dimensions.rows)
         }
     }
 

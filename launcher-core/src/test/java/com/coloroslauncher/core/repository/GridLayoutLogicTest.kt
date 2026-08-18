@@ -123,4 +123,50 @@ class GridLayoutLogicTest {
         assertEquals(listOf(0, 1, 2), reindexed.map { it.dockSlot })
         assertEquals(listOf(5L, 6L, 7L), reindexed.map { it.id })
     }
+
+    @Test
+    fun `initial seed fills the dock first, then the grid row-major`() {
+        val keys = (1..8).map { "pkg$it" }
+
+        val (dockKeys, placements) = GridLayoutLogic.planInitialSeed(
+            componentKeys = keys,
+            dockCapacity = 3,
+            columns = 4,
+            rows = 6,
+        )
+
+        assertEquals(listOf("pkg1", "pkg2", "pkg3"), dockKeys)
+        assertEquals(5, placements.size)
+        assertEquals(GridLayoutLogic.GridPlacement("pkg4", column = 0, row = 0), placements[0])
+        assertEquals(GridLayoutLogic.GridPlacement("pkg7", column = 3, row = 0), placements[3])
+        assertEquals(GridLayoutLogic.GridPlacement("pkg8", column = 0, row = 1), placements[4])
+    }
+
+    @Test
+    fun `initial seed drops apps beyond dock plus grid capacity`() {
+        val keys = (1..10).map { "pkg$it" }
+
+        val (dockKeys, placements) = GridLayoutLogic.planInitialSeed(
+            componentKeys = keys,
+            dockCapacity = 2,
+            columns = 2,
+            rows = 2,
+        )
+
+        assertEquals(2, dockKeys.size)
+        assertEquals(4, placements.size)
+    }
+
+    @Test
+    fun `initial seed with no apps produces nothing`() {
+        val (dockKeys, placements) = GridLayoutLogic.planInitialSeed(
+            componentKeys = emptyList(),
+            dockCapacity = 5,
+            columns = 4,
+            rows = 6,
+        )
+
+        assertTrue(dockKeys.isEmpty())
+        assertTrue(placements.isEmpty())
+    }
 }

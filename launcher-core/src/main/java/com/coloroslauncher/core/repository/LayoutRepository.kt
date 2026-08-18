@@ -6,7 +6,10 @@ import com.coloroslauncher.core.db.entity.FolderEntity
 import com.coloroslauncher.core.db.entity.FolderMemberEntity
 import com.coloroslauncher.core.db.entity.GridItemEntity
 import com.coloroslauncher.core.db.entity.GridItemType
+import com.coloroslauncher.core.model.AppInfo
+import com.coloroslauncher.theme.ThemeConfig
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 /** Persists and mutates the home screen grid + dock + folders, backed by Room. */
 class LayoutRepository(
@@ -91,6 +94,25 @@ class LayoutRepository(
 
     suspend fun reorderDock(newOrder: List<GridItemEntity>) {
         GridLayoutLogic.reindexDockSlots(newOrder).forEach { gridItemDao.update(it) }
+    }
+
+    /**
+     * Populates an empty workspace with the device's installed apps on first launch (a fresh
+     * Room database otherwise leaves the home screen completely empty). No-ops if the dock or
+     * workspace already has anything in it, so this never overwrites a user's own layout.
+     */
+    suspend fun seedInitialLayoutIfEmpty(apps: List<AppInfo>, columns: Int, rows: Int) {
+        if (apps.isEmpty()) return
+        if (observeWorkspaceItems().first().isNotEmpty() || observeDockItems().first().isNotEmpty()) return
+
+        val (dockKeys, placements) = GridLayoutLogic.planInitialSeed(
+            componentKeys = apps.map(AppInfo::componentKey),
+            dockCapacity = ThemeConfig.DOCK_ITEM_COUNT,
+            columns = columns,
+            rows = rows,
+        )
+        dockKeys.forEachIndexed { slot, componentKey -> pinToDock(slot, componentKey) }
+        placements.forEach { placeApp(page = 0, column = it.column, row = it.row, componentKey = it.componentKey) }
     }
 
     companion object {
