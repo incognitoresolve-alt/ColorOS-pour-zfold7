@@ -51,7 +51,9 @@ dependencies {
 
     implementation(libs.window)
 
-    implementation(libs.room.runtime)
+    // api: LauncherDatabase (public) extends RoomDatabase, so consumers like :app that hold a
+    // LauncherDatabase reference need RoomDatabase resolvable on their own compile classpath too.
+    api(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
