@@ -1,0 +1,19 @@
+*.iml
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+.idea/
+.DS_Store
+*.apk
+*.aab
+*.ap_
+*.dex
+/app/release/
+/*/build/
+.kotlin/
+
+# Local config with API keys (weather / web search) - never commit
+secrets.properties

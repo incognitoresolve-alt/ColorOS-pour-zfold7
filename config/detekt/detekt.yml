@@ -1,0 +1,22 @@
+build:
+  maxIssues: 0
+
+style:
+  MagicNumber:
+    active: false
+  ReturnCount:
+    active: false
+
+complexity:
+  LongMethod:
+    threshold: 80
+  LongParameterList:
+    functionThreshold: 8
+    constructorThreshold: 10
+  TooManyFunctions:
+    thresholdInClasses: 25
+
+naming:
+  FunctionNaming:
+    # Allow PascalCase for @Composable functions.
+    functionPattern: '[a-zA-Z][a-zA-Z0-9]*'

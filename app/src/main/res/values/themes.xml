@@ -1,0 +1,8 @@
+<resources>
+    <!-- Bare launch theme: Compose owns all real theming (see ColorOSTheme). This just avoids a
+         white flash and a visible action bar before the first frame is drawn. -->
+    <style name="Theme.ColorOSLauncher" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowIsTranslucent">false</item>
+    </style>
+</resources>
