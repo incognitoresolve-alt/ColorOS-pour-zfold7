@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.coloroslauncher.core.model.AppInfo
+import com.coloroslauncher.core.model.LaunchSource
 import com.coloroslauncher.core.repository.AppRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,8 +47,8 @@ class AppDrawerViewModel(private val appRepository: AppRepository) : ViewModel()
         _uiState.value = _uiState.value.copy(query = query)
     }
 
-    fun launchApp(app: AppInfo) {
-        appRepository.launch(app)
+    fun launchApp(app: AppInfo, source: LaunchSource? = null) {
+        appRepository.launch(app, source)
     }
 
     class Factory(private val appRepository: AppRepository) : ViewModelProvider.Factory {

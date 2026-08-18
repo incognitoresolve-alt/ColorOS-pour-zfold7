@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.coloroslauncher.core.model.AppInfo
+import com.coloroslauncher.core.model.LaunchSource
 import com.coloroslauncher.core.viewmodel.AppDrawerUiState
 
 /** Vertically scrollable app tiroir with a search bar, per requirement #3. */
@@ -24,7 +25,7 @@ fun AppDrawerScreen(
     uiState: AppDrawerUiState,
     columns: Int,
     onQueryChange: (String) -> Unit,
-    onLaunch: (AppInfo) -> Unit,
+    onLaunch: (app: AppInfo, source: LaunchSource?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -42,10 +43,12 @@ fun AppDrawerScreen(
                 .padding(horizontal = 12.dp, vertical = 8.dp),
         ) {
             items(uiState.filteredApps, key = { it.componentKey }) { app ->
+                val (positionModifier, launchSourceProvider) = rememberLaunchSourceCapture()
                 Column(
                     modifier = Modifier
                         .aspectRatio(0.8f)
-                        .clickable { onLaunch(app) },
+                        .then(positionModifier)
+                        .clickable { onLaunch(app, launchSourceProvider()) },
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     AppIconView(app = app)

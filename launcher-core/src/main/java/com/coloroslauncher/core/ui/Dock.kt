@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.coloroslauncher.core.db.entity.GridItemEntity
 import com.coloroslauncher.core.model.AppInfo
+import com.coloroslauncher.core.model.LaunchSource
 import com.coloroslauncher.theme.ThemeConfig
 
 /** Fixed bottom row of favorite apps, always present regardless of the current workspace page. */
@@ -23,7 +24,7 @@ import com.coloroslauncher.theme.ThemeConfig
 fun Dock(
     items: List<GridItemEntity>,
     appsByComponentKey: Map<String, AppInfo>,
-    onTap: (String) -> Unit,
+    onTap: (componentKey: String, source: LaunchSource?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -39,10 +40,13 @@ fun Dock(
     ) {
         items.forEach { item ->
             val app = item.componentKey?.let(appsByComponentKey::get) ?: return@forEach
+            val (positionModifier, launchSourceProvider) = rememberLaunchSourceCapture()
             AppIconView(
                 app = app,
                 showLabel = false,
-                modifier = Modifier.clickable { onTap(app.componentKey) },
+                modifier = Modifier
+                    .then(positionModifier)
+                    .clickable { onTap(app.componentKey, launchSourceProvider()) },
             )
         }
     }

@@ -100,8 +100,8 @@ class MainActivity : ComponentActivity() {
                             uiState = drawerState,
                             columns = homeUiState.gridDimensions.columns,
                             onQueryChange = appDrawerViewModel::onQueryChange,
-                            onLaunch = { app ->
-                                appDrawerViewModel.launchApp(app)
+                            onLaunch = { app, source ->
+                                appDrawerViewModel.launchApp(app, source)
                                 navController.popBackStack()
                             },
                             modifier = Modifier.fillMaxSize(),

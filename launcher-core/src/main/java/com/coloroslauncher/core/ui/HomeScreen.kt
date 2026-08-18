@@ -1,5 +1,7 @@
 package com.coloroslauncher.core.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.coloroslauncher.core.db.entity.GridItemEntity
 import com.coloroslauncher.core.db.entity.GridItemType
+import com.coloroslauncher.core.model.LaunchSource
 import com.coloroslauncher.core.viewmodel.HomeViewModel
 
 /**
@@ -48,7 +51,7 @@ fun HomeScreen(
                     rows = uiState.gridDimensions.rows,
                     appsByComponentKey = uiState.appsByComponentKey,
                     modifier = Modifier.weight(1f),
-                    onTap = { item -> onItemTap(item, viewModel) },
+                    onTap = { item, source -> onItemTap(item, source, viewModel) },
                     onMove = viewModel::moveItem,
                     onDrop = viewModel::handleDrop,
                 )
@@ -64,23 +67,29 @@ fun HomeScreen(
         uiState.openFolderId?.let { folderId ->
             val folderDetailsFlow = remember(folderId) { viewModel.observeFolderDetails(folderId) }
             val details by folderDetailsFlow.collectAsState(initial = HomeViewModel.FolderDetails())
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.6f))
+                    .clickable(onClick = viewModel::closeFolder),
+                contentAlignment = Alignment.Center,
+            ) {
                 FolderOverlay(
                     folderId = folderId,
                     folderName = details.name,
                     members = details.members,
                     onDismiss = viewModel::closeFolder,
                     onRename = { name -> viewModel.renameFolder(folderId, name) },
-                    onLaunch = { app -> viewModel.launchApp(app.componentKey) },
+                    onLaunch = { app, source -> viewModel.launchApp(app.componentKey, source) },
                 )
             }
         }
     }
 }
 
-private fun onItemTap(item: GridItemEntity, viewModel: HomeViewModel) {
+private fun onItemTap(item: GridItemEntity, source: LaunchSource?, viewModel: HomeViewModel) {
     when (item.type) {
-        GridItemType.APP -> item.componentKey?.let(viewModel::launchApp)
+        GridItemType.APP -> item.componentKey?.let { viewModel.launchApp(it, source) }
         GridItemType.FOLDER -> viewModel.openFolder(item.id)
         GridItemType.WIDGET -> Unit
     }

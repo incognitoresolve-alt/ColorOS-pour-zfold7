@@ -1,9 +1,13 @@
 package com.coloroslauncher.core.repository
 
+import android.app.ActivityOptions
+import android.content.ComponentName
 import android.content.Context
 import android.content.pm.LauncherApps
+import android.graphics.Rect
 import android.os.UserHandle
 import com.coloroslauncher.core.model.AppInfo
+import com.coloroslauncher.core.model.LaunchSource
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -36,12 +40,17 @@ class AppRepository(context: Context) {
         }
     }
 
-    fun launch(app: AppInfo, sourceBoundsLeft: Int = 0, sourceBoundsTop: Int = 0) {
+    /** Launches [app], zooming out from [source]'s icon bounds when available (ColorOS-style open transition). */
+    fun launch(app: AppInfo, source: LaunchSource? = null) {
+        val options = source?.let {
+            ActivityOptions.makeScaleUpAnimation(it.view, it.left, it.top, it.width, it.height).toBundle()
+        }
+        val bounds = source?.let { Rect(it.left, it.top, it.left + it.width, it.top + it.height) }
         launcherApps.startMainActivity(
-            android.content.ComponentName(app.packageName, app.activityClassName),
+            ComponentName(app.packageName, app.activityClassName),
             app.user,
-            android.graphics.Rect(sourceBoundsLeft, sourceBoundsTop, sourceBoundsLeft, sourceBoundsTop),
-            null,
+            bounds,
+            options,
         )
     }
 

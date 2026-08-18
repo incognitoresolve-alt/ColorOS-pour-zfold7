@@ -15,9 +15,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.coloroslauncher.core.db.entity.GridItemEntity
 import com.coloroslauncher.core.model.AppInfo
+import com.coloroslauncher.core.model.LaunchSource
+import kotlin.math.absoluteValue
 
 /**
  * Horizontal swipe between workspace pages with a light parallax effect on the background,
@@ -32,7 +35,7 @@ fun WorkspacePager(
     columns: Int,
     rows: Int,
     appsByComponentKey: Map<String, AppInfo>,
-    onTap: (GridItemEntity) -> Unit,
+    onTap: (item: GridItemEntity, source: LaunchSource?) -> Unit,
     onMove: (item: GridItemEntity, page: Int, column: Int, row: Int) -> Unit,
     onDrop: (moving: GridItemEntity, target: GridItemEntity) -> Unit,
     modifier: Modifier = Modifier,
@@ -51,7 +54,17 @@ fun WorkspacePager(
                 columns = columns,
                 rows = rows,
                 appsByComponentKey = appsByComponentKey,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        // Read inside the draw-phase lambda (not composition) so scrolling never
+                        // triggers recomposition — a light depth/parallax cue as pages settle.
+                        val pageOffset =
+                            ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
+                        alpha = 1f - (pageOffset * 0.4f).coerceIn(0f, 0.4f)
+                        scaleX = 1f - (pageOffset * 0.08f).coerceIn(0f, 0.08f)
+                        scaleY = scaleX
+                    },
                 onTap = onTap,
                 onMove = { item, column, row -> onMove(item, page, column, row) },
                 onDrop = onDrop,

@@ -76,9 +76,9 @@ class HomeViewModel(
         }
     }
 
-    fun launchApp(componentKey: String) {
+    fun launchApp(componentKey: String, source: com.coloroslauncher.core.model.LaunchSource? = null) {
         val app = _uiState.value.appsByComponentKey[componentKey] ?: return
-        appRepository.launch(app)
+        appRepository.launch(app, source)
     }
 
     fun moveItem(item: GridItemEntity, newPage: Int, newColumn: Int, newRow: Int) {
