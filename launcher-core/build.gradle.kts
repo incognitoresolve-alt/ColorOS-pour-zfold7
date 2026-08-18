@@ -42,6 +42,7 @@ dependencies {
     implementation(project(":theme"))
 
     implementation(libs.core.ktx)
+    implementation(libs.activity.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.runtime.compose)
