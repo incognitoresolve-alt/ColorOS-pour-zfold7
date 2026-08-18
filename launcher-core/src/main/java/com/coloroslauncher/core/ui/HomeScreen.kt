@@ -39,6 +39,8 @@ fun HomeScreen(
                 val visibleItems = uiState.visibleWorkspaceItems()
                 val itemsByPage = visibleItems.groupBy { it.page }
 
+                ClockHeader()
+
                 WorkspacePager(
                     pageCount = uiState.pageCount,
                     itemsByPage = itemsByPage,
